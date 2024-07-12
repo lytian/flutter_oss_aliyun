@@ -3,12 +3,12 @@ import 'dart:async';
 import 'model/auth.dart';
 
 mixin AuthMixin {
-  late final FutureOr<Auth> Function() authGetter;
+  late final FutureOr<OssAuth> Function() authGetter;
 
-  Auth? auth;
+  OssAuth? auth;
 
   /// get auth information from sts server
-  Future<Auth> getAuth() async {
+  Future<OssAuth> getAuth() async {
     if (isUnAuthenticated) {
       auth = await authGetter();
       return auth!;

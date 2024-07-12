@@ -16,25 +16,25 @@ import 'model/auth.dart';
 import 'model/enums.dart';
 import 'util/dio_client.dart';
 
-class Client with AuthMixin, HttpMixin implements ClientApi {
-  static Client? _instance;
+class OssClient with AuthMixin, HttpMixin implements OssClientApi {
+  static OssClient? _instance;
 
-  factory Client() => _instance!;
+  factory OssClient() => _instance!;
 
   final String endpoint;
   final String bucketName;
   static late Dio _dio;
 
-  Client._({
+  OssClient._({
     required this.endpoint,
     required this.bucketName,
   });
 
-  static Client init({
+  static OssClient init({
     String? stsUrl,
     required String ossEndpoint,
     required String bucketName,
-    FutureOr<Auth> Function()? authGetter,
+    FutureOr<OssAuth> Function()? authGetter,
     Dio? dio,
   }) {
     assert(stsUrl != null || authGetter != null);
@@ -43,9 +43,9 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     final authGet = authGetter ??
         () async {
           final response = await _dio.get<dynamic>(stsUrl!);
-          return Auth.fromJson(response.data!);
+          return OssAuth.fromJson(response.data!);
         };
-    _instance = Client._(endpoint: ossEndpoint, bucketName: bucketName)
+    _instance = OssClient._(endpoint: ossEndpoint, bucketName: bucketName)
       ..authGetter = authGet;
     return _instance!;
   }
@@ -62,7 +62,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey";
     final HttpRequest request = HttpRequest.get(url);
@@ -89,7 +89,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     Options? options,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey";
     final HttpRequest request = HttpRequest.head(url);
@@ -124,7 +124,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     Map<String, dynamic>? params,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
     final int expires = DateTime.now().secondsSinceEpoch() + expireSeconds;
 
     final String url = "https://$bucket.$endpoint/$fileKey";
@@ -168,7 +168,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
     ProgressCallback? onReceiveProgress,
   }) async {
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$endpoint";
     final HttpRequest request = HttpRequest.get(url, parameters: parameters);
@@ -194,7 +194,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint";
     parameters["list-type"] = 2;
@@ -219,7 +219,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint?bucketInfo";
     final HttpRequest request = HttpRequest.get(url);
@@ -242,7 +242,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint?stat";
     final HttpRequest request = HttpRequest.get(url);
@@ -269,7 +269,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     ProgressCallback? onReceiveProgress,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey";
     final HttpRequest request = HttpRequest.get(url);
@@ -295,7 +295,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     PutRequestOption? option,
   }) async {
     final String bucket = option?.bucketName ?? bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final MultipartFile multipartFile = MultipartFile.fromBytes(
       fileData,
@@ -343,7 +343,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     int? position,
   }) async {
     final String bucket = option?.bucketName ?? bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final MultipartFile multipartFile = MultipartFile.fromBytes(
       fileData,
@@ -389,7 +389,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
   }) async {
     final String bucket = option?.bucketName ?? bucketName;
     final String filename = fileKey ?? filepath.split('/').last;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final MultipartFile multipartFile = await MultipartFile.fromFile(
       filepath,
@@ -452,7 +452,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
   /// [bucketName] is optional, we use the default bucketName as we defined in Client
   @override
   Future<List<Response<dynamic>>> putObjects(
-    List<AssetEntity> assetEntities, {
+    List<OssAssetEntity> assetEntities, {
     CancelToken? cancelToken,
   }) async {
     final uploads = assetEntities.map((file) {
@@ -474,7 +474,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     String? bucketName,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey";
     final HttpRequest request = HttpRequest(url, 'HEAD', {}, {});
@@ -514,7 +514,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
       ...externalHeaders
     };
 
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$targetBucketName.$endpoint/$targetFileKey";
     final HttpRequest request = HttpRequest.put(url, headers: headers);
@@ -532,7 +532,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
   Future<Response<dynamic>> getAllRegions({
     CancelToken? cancelToken,
   }) async {
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$endpoint/?regions";
     final HttpRequest request = HttpRequest.get(url);
@@ -552,7 +552,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/?acl";
     final HttpRequest request = HttpRequest.get(url);
@@ -572,7 +572,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/?policy";
     final HttpRequest request = HttpRequest.get(url);
@@ -592,7 +592,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/?policy";
     final HttpRequest request = HttpRequest.delete(url, headers: {
@@ -615,7 +615,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/?policy";
     final HttpRequest request = HttpRequest.put(url, headers: {
@@ -639,7 +639,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     String? bucketName,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/?acl";
     final HttpRequest request = HttpRequest.put(url, headers: {
@@ -661,7 +661,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     String region, {
     CancelToken? cancelToken,
   }) async {
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$endpoint/?regions=$region";
     final HttpRequest request = HttpRequest.get(url);
@@ -682,7 +682,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey";
     final HttpRequest request = HttpRequest.delete(url, headers: {
@@ -723,7 +723,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey?uploads";
     final HttpRequest request = HttpRequest.post(url);
@@ -747,7 +747,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url =
         "https://$bucket.$endpoint/$fileKey?partNumber=$partNumber&uploadId=$uploadId";
@@ -774,7 +774,7 @@ class Client with AuthMixin, HttpMixin implements ClientApi {
     CancelToken? cancelToken,
   }) async {
     final String bucket = bucketName ?? this.bucketName;
-    final Auth auth = await getAuth();
+    final OssAuth auth = await getAuth();
 
     final String url = "https://$bucket.$endpoint/$fileKey?uploadId=$uploadId";
     final HttpRequest request = HttpRequest.post(url, headers: {

@@ -15,7 +15,7 @@ void main() {
     home = Platform.environment['HOME'] ?? Platform.environment['USERPROFILE']!;
     callbackUrl = env['oss_callback_url'] ?? "";
 
-    Client.init(
+    OssClient.init(
       stsUrl: env["sts_url"],
       ossEndpoint: env["oss_endpoint"] ?? "",
       bucketName: env["bucket_name"] ?? "",
@@ -26,7 +26,7 @@ void main() {
     final File file = File("$home/Downloads/idiom.csv");
     final String string = await file.readAsString();
 
-    final Response<dynamic> resp = await Client().putObject(
+    final Response<dynamic> resp = await OssClient().putObject(
       Uint8List.fromList(utf8.encode(string)),
       "test.csv",
       option: PutRequestOption(
@@ -54,7 +54,7 @@ void main() {
   });
 
   test("test the copy object in Client", () async {
-    final Response<dynamic> resp = await Client().copyObject(
+    final Response<dynamic> resp = await OssClient().copyObject(
       const CopyRequestOption(
         sourceFileKey: 'test.csv',
         targetFileKey: "test_copy.csv",
@@ -65,7 +65,7 @@ void main() {
   });
 
   test("test the append object in Client", () async {
-    final Response<dynamic> resp = await Client().appendObject(
+    final Response<dynamic> resp = await OssClient().appendObject(
       Uint8List.fromList(utf8.encode("Hello World")),
       "test_append.txt",
     );
@@ -73,7 +73,7 @@ void main() {
     expect(resp.statusCode, 200);
     expect(resp.headers["x-oss-next-append-position"]?[0], "11");
 
-    final Response<dynamic> resp2 = await Client().appendObject(
+    final Response<dynamic> resp2 = await OssClient().appendObject(
       position: 11,
       Uint8List.fromList(utf8.encode(", Fluter.")),
       "test_append.txt",
@@ -82,7 +82,7 @@ void main() {
     expect(resp2.statusCode, 200);
     expect(resp2.headers["x-oss-next-append-position"]?[0], "20");
 
-    await Client().deleteObject("test_append.txt");
+    await OssClient().deleteObject("test_append.txt");
   });
 
   test("test the put object cancel token in Client", () async {
@@ -91,7 +91,7 @@ void main() {
     final File file = File("$home/Downloads/idiom.csv");
     final String string = file.readAsStringSync();
 
-    await Client().putObject(
+    await OssClient().putObject(
       Uint8List.fromList(utf8.encode(string)),
       "cancel_token_test2.csv",
       option: PutRequestOption(
@@ -116,26 +116,26 @@ void main() {
   });
 
   test("test the get object metadata in Client", () async {
-    final Response<dynamic> resp = await Client().getObjectMeta("test.csv");
+    final Response<dynamic> resp = await OssClient().getObjectMeta("test.csv");
 
     expect(resp.statusCode, 200);
   });
 
   test("test the get all regions in Client", () async {
-    final Response<dynamic> resp = await Client().getAllRegions();
+    final Response<dynamic> resp = await OssClient().getAllRegions();
 
     expect(resp.statusCode, 200);
   });
 
   test("test the get regions in Client", () async {
     final Response<dynamic> resp =
-        await Client().getRegion("oss-ap-northeast-1");
+        await OssClient().getRegion("oss-ap-northeast-1");
 
     expect(resp.statusCode, 200);
   });
 
   test("test the put bucket acl in Client", () async {
-    final Response<dynamic> resp = await Client().putBucketAcl(
+    final Response<dynamic> resp = await OssClient().putBucketAcl(
       AclMode.publicRead,
       bucketName: "huhx-family-dev",
     );
@@ -144,7 +144,7 @@ void main() {
   });
 
   test("test the get bucket acl in Client", () async {
-    final Response<dynamic> resp = await Client().getBucketAcl(
+    final Response<dynamic> resp = await OssClient().getBucketAcl(
       bucketName: "huhx-family-dev",
     );
 
@@ -152,7 +152,7 @@ void main() {
   });
 
   test("test the get bucket policy in Client", () async {
-    final Response<dynamic> resp = await Client().getBucketPolicy(
+    final Response<dynamic> resp = await OssClient().getBucketPolicy(
       bucketName: "huhx-family-dev",
     );
 
@@ -160,7 +160,7 @@ void main() {
   });
 
   test("test the delete bucket policy in Client", () async {
-    final Response<dynamic> resp = await Client().deleteBucketPolicy(
+    final Response<dynamic> resp = await OssClient().deleteBucketPolicy(
       bucketName: "huhx-family-dev",
     );
 
@@ -191,7 +191,7 @@ void main() {
       ]
     };
 
-    final Response<dynamic> resp = await Client().putBucketPolicy(
+    final Response<dynamic> resp = await OssClient().putBucketPolicy(
       policy,
       bucketName: "huhx-family-dev",
     );
@@ -200,7 +200,7 @@ void main() {
   });
 
   test("test the put object file in Client", () async {
-    final Response<dynamic> resp = await Client().putObjectFile(
+    final Response<dynamic> resp = await OssClient().putObjectFile(
       "$home/Downloads/journal_bg-min.png",
       fileKey: "aaa.png",
       option: PutRequestOption(
@@ -225,7 +225,7 @@ void main() {
   });
 
   test("test the put object files in Client", () async {
-    final List<Response<dynamic>> resp = await Client().putObjectFiles([
+    final List<Response<dynamic>> resp = await OssClient().putObjectFiles([
       AssetFileEntity(
         filepath: "$home/Downloads/test.txt",
         option: PutRequestOption(
@@ -249,7 +249,7 @@ void main() {
   });
 
   test("test the list objects in Client", () async {
-    final Response<dynamic> resp = await Client().listObjects({
+    final Response<dynamic> resp = await OssClient().listObjects({
       "max-keys": 12,
       "continuation-token": "ChgyMDIxMTIyMDExMzYyMTAzNDIxNS5qcGcQAA--",
       "prefix": "aaa"
@@ -260,21 +260,21 @@ void main() {
   });
 
   test("test the list buckets in Client", () async {
-    final Response<dynamic> resp = await Client().listBuckets({"max-keys": 2});
+    final Response<dynamic> resp = await OssClient().listBuckets({"max-keys": 2});
 
     print(resp);
     expect(resp.statusCode, 200);
   });
 
   test("test the get bucket info in Client", () async {
-    final Response<dynamic> resp = await Client().getBucketInfo();
+    final Response<dynamic> resp = await OssClient().getBucketInfo();
 
     print(resp);
     expect(resp.statusCode, 200);
   });
 
   test("test the get bucket info in Client", () async {
-    final Response<dynamic> resp = await Client().getBucketStat();
+    final Response<dynamic> resp = await OssClient().getBucketStat();
 
     print(resp);
 
@@ -282,13 +282,13 @@ void main() {
   });
 
   test("test the get object in Client", () async {
-    final Response<dynamic> resp = await Client().getObject("test.txt");
+    final Response<dynamic> resp = await OssClient().getObject("test.txt");
 
     expect(resp.statusCode, 200);
   });
 
   test("test the download object in Client", () async {
-    final Response resp = await Client().downloadObject(
+    final Response resp = await OssClient().downloadObject(
       "test.txt",
       "result.txt",
     );
@@ -302,15 +302,15 @@ void main() {
   });
 
   test("test the delete object in Client", () async {
-    final Response<dynamic> resp = await Client().deleteObject("test.txt");
+    final Response<dynamic> resp = await OssClient().deleteObject("test.txt");
 
     expect(resp.statusCode, 204);
   });
 
   test("test the put objects in Client", () async {
-    final List<Response<dynamic>> resp = await Client().putObjects([
-      AssetEntity(filename: "filename1.txt", bytes: "files1".codeUnits),
-      AssetEntity(filename: "filename2.txt", bytes: "files2".codeUnits),
+    final List<Response<dynamic>> resp = await OssClient().putObjects([
+      OssAssetEntity(filename: "filename1.txt", bytes: "files1".codeUnits),
+      OssAssetEntity(filename: "filename2.txt", bytes: "files2".codeUnits),
     ]);
 
     expect(resp.length, 2);
@@ -319,7 +319,7 @@ void main() {
   });
 
   test("test the delete objects in Client", () async {
-    final List<Response<dynamic>> resp = await Client().deleteObjects([
+    final List<Response<dynamic>> resp = await OssClient().deleteObjects([
       "filename1.txt",
       "filename2.txt",
     ]);
@@ -330,7 +330,7 @@ void main() {
   });
 
   test("test the get object url in Client", () async {
-    final String url = await Client().getSignedUrl(
+    final String url = await OssClient().getSignedUrl(
       "20220106121416393842.jpg",
       params: {"x-oss-process": "image/resize,w_10/quality,q_90", "aaa": "bb"},
     );
@@ -340,7 +340,7 @@ void main() {
   });
 
   test("test the get object urls in Client", () async {
-    final Map<String, String> result = await Client().getSignedUrls([
+    final Map<String, String> result = await OssClient().getSignedUrls([
       "20220106121416393842.jpg",
       "20220106095156755058.jpg",
     ]);
@@ -351,7 +351,7 @@ void main() {
   });
 
   test("test the doesObjectExist in Client", () async {
-    final bool isExisted = await Client().doesObjectExist(
+    final bool isExisted = await OssClient().doesObjectExist(
       "20220106121416393842.jpg",
     );
 

@@ -1,7 +1,7 @@
 import 'request_option.dart';
 
-class AssetEntity {
-  const AssetEntity({
+class OssAssetEntity {
+  const OssAssetEntity({
     required this.filename,
     required this.bytes,
     this.option,

@@ -24,7 +24,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    Client.init(
+    OssClient.init(
       stsUrl: "server sts url",
       ossEndpoint: "oss-cn-beijing.aliyuncs.com",
       bucketName: "bucket name",
@@ -44,7 +44,7 @@ class _HomeScreenState extends State<HomeScreen> {
             TextButton(
               onPressed: () async {
                 final bytes = "Hello World".codeUnits;
-                await Client().putObject(
+                await OssClient().putObject(
                   bytes,
                   "filename.txt",
                   option: PutRequestOption(
@@ -75,7 +75,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await Client().getObject(
+                await OssClient().getObject(
                   "filename.txt",
                   onReceiveProgress: (count, total) {
                     debugPrint("received = $count, total = $total");
@@ -86,7 +86,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await Client().downloadObject(
+                await OssClient().downloadObject(
                   "filename.txt",
                   "./example/savePath.txt",
                   onReceiveProgress: (count, total) {
@@ -98,15 +98,15 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await Client().deleteObject("filename.txt");
+                await OssClient().deleteObject("filename.txt");
               },
               child: const Text("Delete object"),
             ),
             TextButton(
               onPressed: () async {
-                await Client().putObjects(
+                await OssClient().putObjects(
                   [
-                    AssetEntity(
+                    OssAssetEntity(
                       filename: "filename1.txt",
                       bytes: "files1".codeUnits,
                       option: PutRequestOption(
@@ -125,7 +125,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         aclModel: AclMode.inherited,
                       ),
                     ),
-                    AssetEntity(
+                    OssAssetEntity(
                         filename: "filename2.txt", bytes: "files2".codeUnits),
                   ],
                 );
@@ -134,7 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             TextButton(
               onPressed: () async {
-                await Client()
+                await OssClient()
                     .deleteObjects(["filename1.txt", "filename2.txt"]);
               },
               child: const Text("Batch delete object"),

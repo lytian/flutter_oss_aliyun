@@ -3,8 +3,8 @@ import 'package:flutter_oss_aliyun/src/model/request.dart';
 import 'package:flutter_oss_aliyun/src/model/signed_parameters.dart';
 import 'package:flutter_oss_aliyun/src/util/encrypt.dart';
 
-class Auth {
-  const Auth({
+class OssAuth {
+  const OssAuth({
     required this.accessKey,
     required this.accessSecret,
     required this.secureToken,
@@ -16,8 +16,8 @@ class Auth {
   final String secureToken;
   final String expire;
 
-  factory Auth.fromJson(Map<String, dynamic> json) {
-    return Auth(
+  factory OssAuth.fromJson(Map<String, dynamic> json) {
+    return OssAuth(
       accessKey: json['AccessKeyId'] as String,
       accessSecret: json['AccessKeySecret'] as String,
       secureToken: json['SecurityToken'] as String,

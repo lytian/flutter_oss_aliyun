@@ -5,7 +5,7 @@ import 'package:flutter_oss_aliyun/src/model/asset_entity.dart';
 import 'package:flutter_oss_aliyun/src/model/enums.dart';
 import 'package:flutter_oss_aliyun/src/model/request_option.dart';
 
-abstract class ClientApi {
+abstract class OssClientApi {
   Future<Response<dynamic>> getObject(
     String fileKey, {
     String? bucketName,
@@ -82,7 +82,7 @@ abstract class ClientApi {
   });
 
   Future<List<Response<dynamic>>> putObjects(
-    List<AssetEntity> assetEntities, {
+    List<OssAssetEntity> assetEntities, {
     CancelToken? cancelToken,
   });
 
