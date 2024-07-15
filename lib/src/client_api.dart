@@ -172,6 +172,22 @@ abstract class OssClientApi {
     CancelToken? cancelToken,
   });
 
+  Future<Response<dynamic>> listParts(
+    String fileKey,
+    String uploadId, {
+    String? partNumberMarker,
+    String? maxParts,
+    String? bucketName,
+    CancelToken? cancelToken,
+  });
+
+  Future<Response<dynamic>> abortMultipartUpload(
+    String fileKey,
+    String uploadId, {
+    String? bucketName,
+    CancelToken? cancelToken,
+  });
+
   Future<Response<dynamic>> completeMultipartUpload(
     String fileKey,
     String uploadId,

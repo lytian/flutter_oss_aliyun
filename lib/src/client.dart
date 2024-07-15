@@ -764,15 +764,71 @@ class OssClient with AuthMixin, HttpMixin implements OssClientApi {
     );
   }
 
+  /// ListParts接口用于列举指定Upload ID所属的所有已经上传成功Part。
+  @override
+  Future<Response> listParts(
+    String fileKey,
+    String uploadId,{
+    String? partNumberMarker,
+    String? maxParts,
+    String? bucketName,
+    CancelToken? cancelToken
+  }) async {
+    final String bucket = bucketName ?? this.bucketName;
+    final OssAuth auth = await getAuth();
+
+   String url = "https://$bucketName.$endpoint/$fileKey?uploadId=$uploadId";
+    if (partNumberMarker != null) {
+      url += '&part-number-marker=$partNumberMarker';
+    }
+    if (maxParts != null) {
+      url += '&max-parts=$maxParts';
+    }
+    final HttpRequest request = HttpRequest.post(url, headers: {
+      'content-type': 'application/xml',
+    });
+    auth.sign(request, bucket, "$fileKey?uploadId=$uploadId");
+
+    return _dio.get(
+      request.url,
+      cancelToken: cancelToken,
+      options: Options(headers: request.headers),
+    );
+  }
+
+  /// AbortMultipartUpload接口用于取消MultipartUpload事件并删除对应的Part数据。
+  @override
+  Future<Response> abortMultipartUpload(
+      String fileKey,
+      String uploadId, {
+        String? bucketName,
+        CancelToken? cancelToken,
+      }) async {
+    final String bucket = bucketName ?? this.bucketName;
+    final OssAuth auth = await getAuth();
+
+    final String url = "https://$bucketName.$endpoint/$fileKey?uploadId=$uploadId";
+    final HttpRequest request = HttpRequest.post(url, headers: {
+      'content-type': 'application/xml',
+    });
+    auth.sign(request, bucket, "$fileKey?uploadId=$uploadId");
+
+    return _dio.delete(
+      request.url,
+      cancelToken: cancelToken,
+      options: Options(headers: request.headers),
+    );
+  }
+
   /// completeMultipartUpload from oss
   @override
   Future<Response<dynamic>> completeMultipartUpload(
-    String fileKey,
-    String uploadId,
-    String data, {
-    String? bucketName,
-    CancelToken? cancelToken,
-  }) async {
+      String fileKey,
+      String uploadId,
+      String data, {
+        String? bucketName,
+        CancelToken? cancelToken,
+      }) async {
     final String bucket = bucketName ?? this.bucketName;
     final OssAuth auth = await getAuth();
 
